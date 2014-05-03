@@ -1,0 +1,28 @@
+html {
+  font-family: sans-serif;
+  -ms-text-size-adjust: 100%;
+  -webkit-text-size-adjust: 100%;
+  background-color:#aac;
+  padding-top:10px;
+  background-image: url(img/branch2.png);
+  background-position:30px 10px;
+  background-repeat: no-repeat;
+}
+
+body {
+  background-color:#fff;
+  max-width:37em;
+  margin:0 auto; 
+  padding:2.6em;
+  border:2px solid #888;
+  -webkit-border-radius: 9px;
+  -moz-border-radius: 9px;
+  border-radius: 9px;
+}
+
+pre {
+  background-color:#eef;
+  padding:1em;
+  color:#000;
+}
+
