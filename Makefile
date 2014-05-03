@@ -1,10 +1,26 @@
-tidy_err_log = tidy.errors
 info_outline = info-outline.xml
 
-AUTO_GEN_FILES = sxslt.h* sxslt.xh* \
-  $(tidy_err_log) $(info_outline)
+AUTO_GEN_FILES = $(info_outline)
 
 all: sxslt.xhtml $(info_outline)
+
+	
+infos = $(wildcard infos/*)
+$(info_outline): $(infos)
+	ls $(dir $<) > $@
+
+index.xhtml: index.m4 $(info_outline)
+
+clean:
+	rm -rf $(AUTO_GEN_FILES)
+
+
+# external stuff;
+
+# TODO move to .mk file
+tidy_err_log = tidy.errors 
+
+AUTO_GEN_FILES += $(tidy_err_log) sxslt.h* sxslt.xh*
 
 sxslt.xhtml: sxslt.html
 	-tidy -f $(tidy_err_log) -qci \
@@ -18,12 +34,4 @@ sxslt.html: sxslt.tex
 	hevea -s $^ 
 # test
 	xmllint --html --noout $@
-	
-infos = $(wildcard infos/*)
-$(info_outline): $(infos)
-	ls $(dir $<) > $@
 
-index.xhtml: index.m4 $(info_outline)
-
-clean:
-	rm -rf $(AUTO_GEN_FILES)
