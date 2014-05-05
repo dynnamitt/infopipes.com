@@ -4,7 +4,7 @@ html {
   -webkit-text-size-adjust: 100%;
   background-color:#aac;
   padding-top:10px;
-  background-image: url(img/branch2.png);
+  background-image: url(../img/branch2.png);
   background-position:30px 10px;
   background-repeat: no-repeat;
 }

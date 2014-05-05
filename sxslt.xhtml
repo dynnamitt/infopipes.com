@@ -1,0 +1,894 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta name="generator" content=
+  "HTML Tidy for Linux (vers 25 March 2009), see www.w3.org" />
+  <meta http-equiv="Content-Type" content=
+  "text/html; charset=us-ascii" />
+  <meta name="generator" content="hevea 2.14" />
+  <style type="text/css">
+/*<![CDATA[*/
+  .li-itemize{margin:1ex 0ex;}
+  .li-enumerate{margin:1ex 0ex;}
+  .dd-description{margin:0ex 0ex 1ex 4ex;}
+  .dt-description{margin:0ex;}
+  .toc{list-style:none;}
+  .footnotetext{margin:0ex; padding:0ex;}
+  div.footnotetext P{margin:0px; text-indent:1em;}
+  .thefootnotes{text-align:left;margin:0ex;}
+  .dt-thefootnotes{margin:0em;}
+  .dd-thefootnotes{margin:0em 0em 0em 2em;}
+  .footnoterule{margin:1em auto 1em 0px;width:50\char045;}
+  .caption{padding-left:2ex; padding-right:2ex; margin-left:auto; margin-right:auto}
+  .title{margin:2ex auto;text-align:center}
+  .titlemain{margin:1ex 2ex 2ex 1ex;}
+  .titlerest{margin:0ex 2ex;}
+  .center{text-align:center;margin-left:auto;margin-right:auto;}
+  .flushleft{text-align:left;margin-left:0ex;margin-right:auto;}
+  .flushright{text-align:right;margin-left:auto;margin-right:0ex;}
+  div table{margin-left:inherit;margin-right:inherit;margin-bottom:2px;margin-top:2px}
+  td table{margin:auto;}
+  table{border-collapse:collapse;}
+  td{padding:0;}
+  .cellpadding0 tr td{padding:0;}
+  .cellpadding1 tr td{padding:1px;}
+  pre{text-align:left;margin-left:0ex;margin-right:auto;}
+  blockquote{margin-left:4ex;margin-right:4ex;text-align:left;}
+  td p{margin:0px;}
+  .boxed{border:1px solid black}
+  .textboxed{border:1px solid black}
+  .vbar{border:none;width:2px;background-color:black;}
+  .hbar{border:none;height:2px;width:100\char045;background-color:black;}
+  .hfill{border:none;height:1px;width:200\char045;background-color:black;}
+  .vdisplay{border-collapse:separate;border-spacing:2px;width:auto; empty-cells:show; border:2px solid red;}
+  .vdcell{white-space:nowrap;padding:0px; border:2px solid green;}
+  .display{border-collapse:separate;border-spacing:2px;width:auto; border:none;}
+  .dcell{white-space:nowrap;padding:0px; border:none;}
+  .dcenter{margin:0ex auto;}
+  .vdcenter{border:solid #FF8000 2px; margin:0ex auto;}
+  .minipage{text-align:left; margin-left:0em; margin-right:auto;}
+  .marginpar{border:solid thin black; width:20\char045; text-align:left;}
+  .marginparleft{float:left; margin-left:0ex; margin-right:1ex;}
+  .marginparright{float:right; margin-left:1ex; margin-right:0ex;}
+  .theorem{text-align:left;margin:1ex auto 1ex 0ex;}
+  .part{margin:2ex auto;text-align:center}
+  /*]]>*/
+  </style>
+
+  <title>Authoring dynamic websites with SXML</title>
+  <style type="text/css">
+/*<![CDATA[*/
+  span.c4 {font-size:small}
+  hr.c3 {height:2}
+  span.c2 {font-family:monospace}
+  td.c1 {padding:1ex}
+  /*]]>*/
+  </style>
+
+  <link rel="stylesheet" type="text/css" href="css/info-p-sxml.css" />
+</head>
+
+<body>
+  <!--HEVEA command line is: hevea -s sxslt.tex -->
+  <!--CUT STYLE article--><!--CUT DEF section 1 -->
+
+  <table class="title">
+    <tr>
+      <td class="c1">
+        <h1 class="titlemain">Authoring dynamic websites with
+        SXML</h1>
+
+        <h3 class="titlerest">Peter&nbsp;Bex</h3>
+
+        <h3 class="titlerest">February, 2007</h3>
+      </td>
+    </tr>
+  </table><!--TOC section id="sec1" Introduction-->
+
+  <h2 id="sec1" class="section">1&nbsp;&nbsp;Introduction</h2>
+  <!--SEC END -->
+
+  <p>There are roughly two ways of dynamically generating websites.
+  One way is the PHP way (or Perl, Ruby, etc). This means you
+  simply write some HTML code and sprinkle code with side-effects
+  in between. There are clear disadvantages to this. For example,
+  operating on fragments of code must be done on the string-level,
+  which is too low to do meaningful post-processing without writing
+  ad-hoc HTML parsers. This also has the disadvantage that
+  malicious or obnoxious HTML and scripts can be inserted
+  relatively easy in the output by any potential attackers of your
+  site, unless you take great care to escape HTML characters.</p>
+
+  <p>The other way is to use XML. Then you need to learn a number
+  of different XML technologies like XSL, which includes XSLT and
+  XPath or XQuery. On top of that, you still need to use a
+  scripting language to express your business logic (XExpr, or any
+  other scripting language like PHP). XML is also quite hard to
+  read for a human being because of its verbosity. Any Scheme
+  hacker who has done some moderate to heavy web programming will
+  be annoyed by this state of affairs. Why can&rsquo;t we just use
+  one tool to do it all? Well, we can!</p>
+
+  <p>By using SXML instead of these other technologies, you can use
+  your existing knowledge of Scheme and a handful of procedures
+  that can assist you in transforming XML in a completely
+  functional way. Another advantage is that if you happen to have
+  some existing XSL code, you do not have to discard it. You can
+  simply take that code and feed it XML output from your SXML code
+  without any problems.</p>
+
+  <p>There is quite a bit of information available at the <a href=
+  "http://ssax.sourceforge.net">SSAX project page</a>, but in my
+  opinion it&rsquo;s quite fragmented and too academic.
+  That&rsquo;s why I decided to write this hands-on tutorial. This
+  tutorial is aimed at people who have never worked with SXML. It
+  is assumed the reader is familiar with XHTML and has a working
+  knowledge of Scheme. No knowledge of the corresponding XML
+  technologies is assumed, but it may make it easier for you to
+  understand. If you do not know Scheme yet, you may want to check
+  out <a href="http://www.schemers.org"><span class=
+  "c2">http://www.schemers.org</span></a> to see what it&rsquo;s
+  all about.</p><!--TOC section id="sec2" What is SXML?-->
+
+  <h2 id="sec2" class="section">2&nbsp;&nbsp;What is SXML?</h2>
+  <!--SEC END -->
+
+  <p>SXML is simply a way to write XML as s-expressions. The
+  official specification for SXML can be found at <a href=
+  "http://okmij.org/ftp/Scheme/SXML.html"><span class=
+  "c2">http://okmij.org/ftp/Scheme/SXML.html</span></a>. A simple
+  XHTML page looks like this:</p>
+  <pre class="verbatim">
+&lt;html xmlns="http://www.w3.org/1999/xhtml"
+      xml:lang="en" lang="en"&gt;
+  &lt;head&gt;
+    &lt;title&gt;An example page&lt;/title&gt;
+  &lt;/head&gt;
+  &lt;body&gt;
+    &lt;h1 id="greeting"&gt;Hi, there!&lt;/h1&gt;
+    &lt;p&gt;This is just an &amp;gt;&amp;gt;example&amp;lt;&amp;lt; to show XHTML &amp;amp; SXML.&lt;/p&gt;
+  &lt;/body&gt;
+&lt;/html&gt;
+</pre>
+
+  <p>We can translate this to SXML by hand<sup><a id="text1" href=
+  "#note1" name="text1">1</a></sup> and obtain the following:</p>
+  <pre class="verbatim">
+(html (@ (xmlns "http://www.w3.org/1999/xhtml")
+         (xml:lang "en") (lang "en"))
+  (head
+    (title "An example page"))
+  (body
+    (h1 (@ (id "greeting")) "Hi, there")
+    (p "This is just an &gt;&gt;example&lt;&lt; to show XHTML &amp; SXML.")))
+</pre>
+
+  <p>Each element&rsquo;s tag pair is replaced by a set of
+  parentheses. The tag&rsquo;s name is not repeated at the end, it
+  is simply the first symbol in the list. The element&rsquo;s
+  contents follow, which are either elements themselves or strings.
+  There is <em>no</em> special syntax required for XML attributes.
+  In SXML they are simply represented as just another node, which
+  has the special name of <code>@</code>. This can&rsquo;t cause a
+  name clash with an actual &ldquo;<code>@</code>&rdquo; tag,
+  because <code>@</code> is not allowed as a tag name in XML. This
+  is a common pattern in SXML: Anytime a tag is used to indicate a
+  special status or something that is not possible in XML, a name
+  is used that does not constitute a valid XML identifier.</p>
+
+  <p>We can also see that there&rsquo;s no need to
+  &ldquo;escape&rdquo; otherwise meaningful characters like
+  <code>&amp;</code> and <code>&gt;</code> as
+  <code>&amp;amp;</code> and <code>&amp;gt;</code> entities. All
+  string content is automatically escaped because it is considered
+  to be pure content, and has no tags or entities in it. This also
+  means it is much easier to insert autogenerated content and there
+  is no danger that we might forget to escape user input when we
+  display it to other users (which could lead to all kinds of nasty
+  cross-site scripting attacks or other annoyances).</p>
+  <!--TOC section id="sec3" SXML for websites-->
+
+  <h2 id="sec3" class="section">3&nbsp;&nbsp;SXML for websites</h2>
+  <!--SEC END -->
+
+  <p>Now we know how to translate any X(HT)ML document to SXML,
+  let&rsquo;s see how we can write SXML that gets translated to
+  XHTML. The following illustrates the typical pattern we&rsquo;ll
+  see a lot when generating websites:</p>
+  <pre class="verbatim">
+(define document
+  '(html (@ (xmlns "http://www.w3.org/1999/xhtml")
+            (xml:lang "en") (lang "en"))
+     (head
+       (title "An example page"))
+     (body
+       (h1 (@ (id "greeting")) "Hi, there")
+       (p "This is just an &gt;&gt;example&lt;&lt; to show XHTML &amp; SXML."))))
+
+(SRV:send-reply (pre-post-order document universal-conversion-rules))
+</pre>
+
+  <p>The call to <code>SRV:send-reply</code> has the
+  <em>side-effect</em> of displaying the HTML to the current output
+  port so if you want it in a string you&rsquo;ll have to
+  explicitly capture the current output port (eg, with
+  <code>with-output-to-string</code> or some other
+  implementation-specific procedure).</p>
+
+  <p>The procedure <code>pre-post-order</code> is the core of
+  SXSLT. Right now we&rsquo;ve only used it as a translator from
+  generic SXML to something SRV:send-reply can output. If you just
+  try to run <code>(SRV:send-reply document)</code>, you&rsquo;ll
+  see the output is some kind of dumb concatenation of the
+  flattened SXML tree. What <code>pre-post-order</code> does here
+  is transform the SXML tree to some semi-flattened form of the
+  SXML that can be concatenated so an XML string can be created by
+  <code>SRV:send-reply</code>. The
+  <code>universal-conversion-rules</code> are rules that tell it
+  how it can do that. Don&rsquo;t worry if you don&rsquo;t
+  understand this yet. We&rsquo;ll look at
+  <code>pre-post-order</code> in much more detail in a few
+  moments.</p><!--TOC section id="sec4" Semantic content-->
+
+  <h2 id="sec4" class="section">4&nbsp;&nbsp;Semantic content</h2>
+  <!--SEC END -->
+
+  <p>If you would only use the information above, you&rsquo;d
+  already have a very useful tool at your disposal. You can view
+  any XML tree as a simple Scheme list. This means that any
+  operation you can perform on lists, you can perform on SXML as
+  well. A simple but useful example is when we would like to
+  describe our pages in a more semantic way. For example, we would
+  like to be able to write the following:</p>
+  <pre class="verbatim">
+(define semantic-page
+  '(page "Welcome to my homepage"
+      (navigation)
+      (greeting "Hi there")
+      (p "This is a nice example page")
+      (footer)))
+</pre>
+
+  <p>We could use the same structure in every page. Actually, if
+  every single page has a navigation and footer, we could even
+  leave those out. We can see how this is a much more semantic way
+  to describe our page. To actually transform this to valid XHTML,
+  we could use the following code (which could be common code we
+  include in all pages in our site):</p>
+  <pre class="verbatim">
+(define (translator content)
+  (cond
+    ((null? content) '())
+    ((list? (car content))
+      (cons (translator (car content))
+            (translator (cdr content))))  ;; Recurse down into lists
+    ((eq? (car content) 'page)
+     `(html (@ (xmlns "http://www.w3.org/1999/xhtml")
+                (xml:lang "en") (lang "en"))
+       (head (title ,(cadr content)))
+       (body ,(translator (cddr content)))))
+    ((eq? (car content) 'greeting)
+     `(h1 (@ (id "greeting")) ,(cadr content)))
+    ((eq? (car content) 'navigation)
+     (cons
+       `(ul
+          (li (a (@ (href "home")) "homepage"))
+          (li (a (@ (href "about")) "about this site"))
+          (li (a (@ (href "contact")) "contact us")))
+        (translator (cdr content))))
+    ((eq? (car content) 'footer)
+     '(p "Copyright (c) 2007"))
+    (else (cons (car content) (translator (cdr content))))))
+
+(define document (translator semantic-page))
+
+(SRV:send-reply (pre-post-order document universal-conversion-rules))
+</pre>
+
+  <p>I&rsquo;m sure you&rsquo;ll agree this explicit rewriting of
+  the SXML tree with custom code is not exactly fun. We&rsquo;d
+  like to have some kind of generalised way to do these rewrites,
+  without having to explicitly write the behaviour every time. In
+  other words, we&rsquo;d like to define our transformations in a
+  sort of <em>stylesheet</em> DSL. This is exactly what SXSLT is.
+  We can write the above as follows:</p>
+  <pre class="verbatim">
+(define my-rules
+  `((page . ,(lambda (tag page-title . contents)
+               `(html (@ (xmlns "http://www.w3.org/1999/xhtml")
+                         (xml:lang "en") (lang "en"))
+                      (head (title ,page-title))
+                      (body ,contents))))
+    (navigation . ,(lambda (tag)
+                     `(ul
+                       (li (a (@ (href "home"))    "homepage"))
+                       (li (a (@ (href "about"))   "about this site"))
+                       (li (a (@ (href "contact")) "contact us")))))
+    (greeting . ,(lambda (tag str)
+                   `(h1 (@ (id "greeting")) ,str)))
+    (footer . ,(lambda (tag)
+                 `(p "Copyright (c) 2007")))
+    (*text* . ,(lambda (tag str) str))
+    (*default* . ,(lambda x x))))
+
+(SRV:send-reply (pre-post-order
+                 (pre-post-order semantic-page my-rules)
+                 universal-conversion-rules))
+</pre>
+
+  <p>Not only is the SXML shorter to write and less error-prone,
+  but it is also clearer what is happening. Every high-level
+  &ldquo;tag&rdquo; we defined is listed on the left, and the
+  transformation code to run on that tag is shown on the right
+  part. If you would like to take a look at the generated SXML
+  code, do the following: <code>(pre-post-order semantic-page
+  my-rules)</code></p>
+  <!--TOC subsection id="sec5" Slowing down a bit-->
+
+  <h3 id="sec5" class="subsection">4.1&nbsp;&nbsp;Slowing down a
+  bit</h3><!--SEC END -->
+
+  <p>Let&rsquo;s look at what happens here in more detail by
+  investigating one rule up close:</p>
+  <pre class="verbatim">
+(greeting .
+  ,(lambda (tag str)
+     `(h1 (@ (id "greeting")) ,str)))
+</pre>
+
+  <p>The <code>pre-post-order</code> procedure walks the SXML tree
+  almost in the same way our custom code did. The custom code
+  simply looked at every element in the tree to see if it matched
+  one of the expected symbols. But <code>pre-post-order</code>
+  actually only looks at tags, ie the first symbol of a sublist. If
+  the first rule does not match, it looks at the next rule, much
+  like our custom code. If it finds a match for the tag, the tag
+  name and all of its childnodes are passed to the transformation
+  procedure as arguments. If there are no matches at all, the
+  <code>*default*</code> rule is applied, which in this case leaves
+  the content untouched. The <code>*text*</code> rule is applied to
+  all leafnodes (ie, non-list nodes, which can be strings or
+  symbols among other things). More about these special rules
+  later.</p>
+
+  <p>In our case, the <code>greeting</code> element has only one
+  element under it, the greeting&rsquo;s text. This is put inside a
+  <code>h1</code>. If we would like the name of the page to be
+  printed smaller, we could simply modify this rule and every page
+  would have its name printed smaller. It would also allow us to
+  attach an id or class to it so we can target it with CSS for
+  further styling.</p>
+
+  <p>If we look at the SXML code again for a second, we see that
+  the greeting element looks very much like a procedure call to the
+  <code>lambda</code> defined above:</p>
+  <pre class="verbatim">
+'(greeting "Hi there")
+</pre>
+
+  <p>The only difference is that the <code>lambda</code> accepts
+  one more argument: the tag&rsquo;s name. This can be useful if
+  you use the same procedure for several rules (or for a
+  <code>*default*</code> rule).</p>
+  <!--TOC section id="sec6" Tree traversal methods-->
+
+  <h2 id="sec6" class="section">5&nbsp;&nbsp;Tree traversal
+  methods</h2><!--SEC END -->
+
+  <p>We have only seen part of <code>pre-post-order</code>&rsquo;s
+  power. The procedure is called that way because there are two
+  different &ldquo;orders&rdquo; in which one can traverse an
+  SXML-tree: Inside-out or outside-in. Let&rsquo;s look at another
+  example:</p>
+  <pre class="verbatim">
+(define counter
+  `(child-count (children)))
+
+(define counting-rules
+  `((child-count .
+      ,(lambda (tag children)
+         `(kids ,(length children) ,children)))
+    (children .
+      ,(lambda (tag)  ;; Just create 10 child tags
+         (list-tabulate 10 (lambda _ '(child)))))
+    (*text* .
+      ,(lambda (tag str) str))
+    (*default* .
+      ,(lambda x x))))
+
+(pre-post-order counter counting-rules)
+</pre>
+
+  <p>This is a simple set of rules. The <code>children</code> rule
+  generates 10 <code>child</code> elements. The
+  <code>child-count</code> rule simply counts its children and puts
+  the number in front of them. The question is now: Will it count 1
+  or 10? What it prints depends on whether pre-post-order traverses
+  the tree pre-order or post-order.</p>
+
+  <p>Go ahead and try it out. You&rsquo;ll see that the default
+  order (the order we&rsquo;ve seen up &rsquo;till now) is actually
+  post-order, or inside-out. The children are generated first, and
+  the resulting subtree is used in the call to the
+  <code>child-count</code> rule. The result is</p>
+  <pre class="verbatim">
+(kids 10 ((child) (child) (child) (child) (child)
+          (child) (child) (child) (child) (child)))
+</pre>
+
+  <p>If we don&rsquo;t like this behaviour, we can change the
+  <code>child-count</code> rule&rsquo;s order:</p>
+  <pre class="verbatim">
+(child-count *preorder* .
+  ,(lambda (tag children)
+     `(kids ,(length children) ,children)))
+</pre>
+
+  <p>This will produce the following result:</p>
+  <pre class="verbatim">
+(kids 1 (children))
+</pre>
+
+  <p>Wait a minute! That&rsquo;s not what we expected, is it? The
+  <code>(children)</code> element isn&rsquo;t transformed anymore!
+  That&rsquo;s because <code>*preorder*</code> rules block the
+  transformation process. To obtain truly outside-in behaviour, we
+  need to explicitly call <code>pre-post-order</code> in the
+  rule:</p>
+  <pre class="verbatim">
+(child-count *preorder* .
+  ,(lambda (tag children)
+     (pre-post-order
+       `(kids ,(length children) ,children))
+       counting-rules))
+</pre>
+
+  <p>This results in the correct response of</p>
+  <pre class="verbatim">
+(kids 1 ((child) (child) (child) (child) (child)
+         (child) (child) (child) (child) (child)))
+</pre>
+
+  <p>We could&rsquo;ve just called <code>pre-post-order</code> on
+  the <code>children</code>, but the shown pattern is so common
+  that there is a shortcut:</p>
+  <pre class="verbatim">
+(child-count *macro* .
+  ,(lambda (tag children)
+     `(kids ,(length children) ,children)))
+</pre>
+
+  <p>This does exactly the same as calling
+  <code>pre-post-order</code> on a <code>*preorder*</code>
+  rule&rsquo;s result. Be careful not to introduce endless loops
+  this way! If the macro&rsquo;s rule returns an element that is
+  transformed by another rule, it may be possible that there will
+  be no end to the transformations. It is tempting to make
+  everything <code>*macro*</code> rules, because very often rules
+  produce new content that also contains tags that need to be
+  rewritten. There are many examples where we need
+  <code>*macro*</code>, even if we don&rsquo;t really care about
+  the order of transformation. Here is one:</p>
+  <pre class="verbatim">
+(kids . ,(lambda (tag . contents) `(h2 ,@contents)))
+</pre>
+
+  <p>The <code>kids</code> tag is of course not a valid HTML rule,
+  so we probably want to reduce it further. If we use the
+  <code>*preorder*</code> rule, the <code>kids</code> node is
+  obviously not reduced to a <code>h2</code>. But if we use the
+  original post-order rule (the one without <code>*preorder*</code>
+  or <code>*macro*</code>), the result doesn&rsquo;t have
+  <code>pre-post-order</code> applied to it either. Calling
+  <code>pre-post-order</code> on a post-order rule&rsquo;s result
+  is wasteful because it will traverse the whole subtree again.
+  However, if we use <code>*macro*</code>, it will traverse the
+  subtree only once. Unfortunately, we&rsquo;ll have to traverse
+  the <code>children</code> rule first, and the resulting tag as
+  well, so we can&rsquo;t really evade traversing the tree
+  twice.</p>
+  <pre class="verbatim">
+(child-count .
+  ,(lambda (tag children)
+     (pre-post-order
+       `(kids ,(length children) ,children))
+       counting-rules))
+</pre><!--TOC section id="sec7" Unescaped content-->
+
+  <h2 id="sec7" class="section">6&nbsp;&nbsp;Unescaped content</h2>
+  <!--SEC END -->
+
+  <p>On certain occasions, you want to enter the raw XML output
+  directly as a string, without having <code>pre-post-order</code>
+  escape it for you. For example, we might want to output a HTML
+  document-type:</p>
+  <pre class="verbatim">
+(define broken-page-rules
+  `((page *macro* .
+      ,(lambda (tag title . rest)
+         `((doctype)
+           (html (@ (xmlns "http://www.w3.org/1999/xhtml")
+                    (xml:lang "en") (lang "en"))
+             (head
+               (link (@ (rel "stylesheet")
+                        (type "text/css")
+                        (href "layout.css")))
+               (title ,title))
+             (body ,@rest)))))
+    (doctype .
+      ,(lambda (tag)
+         (string-append
+           "&lt;!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\""
+           " \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\"&gt;")))
+    (*text* . ,(lambda (tag str) str))
+    (*default* . ,(lambda x x))))
+
+(define content
+  '(page "test"
+     (h1 "blah")))
+
+(SRV:send-reply (pre-post-order
+                 (pre-post-order content broken-page-rules)
+                 universal-conversion-rules))
+</pre>
+
+  <p>If we try to build a page with these rules, we&rsquo;ll see it
+  goes wrong because the doctype rule is escaped. We can bypass the
+  escaping by extending the
+  <code>universal-conversion-rules</code>. These rules are just
+  rules like we&rsquo;ve made ourselves. They consist of
+  <code>*default*</code> and <code>*text*</code> rules that take
+  care of the escaping and translation of lists to tags. We can do
+  it like this:</p>
+  <pre class="verbatim">
+(define page-rules
+  `((page .
+      ,(lambda (tag title . rest)
+         `((doctype)
+           (html (@ (xmlns "http://www.w3.org/1999/xhtml")
+                    (xml:lang "en") (lang "en"))
+             (head
+               (link (@ (rel "stylesheet")
+                        (type "text/css")
+                        (href "layout.css")))
+               (title ,title))
+             (body ,@rest)))))
+    (*text* . ,(lambda (tag str) str))
+    (*default* . ,(lambda x x))))
+
+(define doctype-rules
+  `((doctype .
+      ,(lambda (tag)
+         (string-append
+           "&lt;!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\""
+           " \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\"&gt;")))))
+
+(define content
+  '(page "test"
+     (h1 "blah")))
+
+(SRV:send-reply (pre-post-order
+                 (pre-post-order content my-rules)
+                 (append doctype-rules universal-conversion-rules)))
+</pre><!--TOC section id="sec8" A few useful tools-->
+
+  <h2 id="sec8" class="section">7&nbsp;&nbsp;A few useful
+  tools</h2><!--SEC END -->
+
+  <p>In order to streamline this whole stuff a bit, it&rsquo;s nice
+  to build a few helper procedures. I will now give you a few tools
+  I&rsquo;ve found useful when writing my own pages.</p>
+  <!--TOC subsection id="sec9" Hassle-free output-->
+
+  <h3 id="sec9" class="subsection">7.1&nbsp;&nbsp;Hassle-free
+  output</h3><!--SEC END -->
+  <pre class="verbatim">
+;; Requires SRFI-1, for fold
+
+(define (sxml-apply-rules content . rules)
+   (fold (lambda (rules content)
+           (pre-post-order content rules)) content rules))
+
+(define (output-html content . rules)
+  (SRV:send-reply (apply sxml-apply-rules content rules)))
+</pre>
+
+  <p>These two<sup><a id="text2" href="#note2" name=
+  "text2">2</a></sup> are very useful, since we often end up
+  nesting a lot of calls to <code>pre-post-order</code>, resulting
+  in a big bunch of code just to send the output to the
+  user&rsquo;s browser. That&rsquo;s what
+  <code>sxml-apply-rules</code> is for, now we can just call
+  <code>(sxml-apply-rules document my-rules
+  universal-conversion-rules)</code>. If we don&rsquo;t want the
+  resulting SXML, we can call <code>output-html</code> instead of
+  <code>sxml-apply-rules</code> and it not only applies
+  <code>pre-post-order</code> for each of the rules, but it also
+  sends the output directly to the browser.</p>
+  <!--TOC subsection id="sec10" Entities-->
+
+  <h3 id="sec10" class="subsection">7.2&nbsp;&nbsp;Entities</h3>
+  <!--SEC END -->
+
+  <p>I have not yet explained how to output HTML entities like
+  <code>&amp;gt;</code>. If you simply try to output an entity as a
+  string, you&rsquo;ll see that the
+  <code>universal-conversion-rules</code> will recode the
+  <code>&amp;</code> to <code>&amp;amp;</code>, which means that
+  <code>&amp;gt;</code> will look like <code>&amp;amp;gt;</code> in
+  the final output. This is definitely not what we want.
+  We&rsquo;ll have to define a rule that we can add to the
+  <code>universal-conversion-rules</code>. We&rsquo;ll take the
+  rule from the Chicken scheme system, which already provides one
+  exactly for this reason in its default
+  <code>universal-conversion-rules</code> for its
+  <code>sxml-transforms</code> egg:</p>
+  <pre class="verbatim">
+(define universal-conversion-rules
+  (append
+    universal-conversion-rules
+    `((&amp; . ,(lambda (tag . elts)
+              (map (lambda (elt)
+                     (string-append "&amp;" elt ";"))
+                   elts))))))
+</pre>
+
+  <p>Now we can just write a page like this:</p>
+  <pre class="verbatim">
+;; 10 &gt; 1 and 1 &lt; 10
+(define document
+  '((page "Entities example"
+      "10 &gt; 1 and 1 " (&amp; "lt") " 10")))
+</pre>
+
+  <p>And now it doesn&rsquo;t matter how many rulesets we apply to
+  this, since only the final
+  <code>universal-conversion-rules</code> translates.</p>
+  <!--TOC subsection id="sec11" Adding classes-->
+
+  <h3 id="sec11" class="subsection">7.3&nbsp;&nbsp;Adding
+  classes</h3><!--SEC END -->
+
+  <p>Very often, you need to conditionally add a class to an
+  already existing piece of content. It&rsquo;s quite useful to be
+  able to have a procedure that does this.</p>
+  <pre class="verbatim">
+;; Uses sxml-match, SRFI-1 for lset-union
+;; and SRFI-13 for string-tokenize and string-join
+(define (add-classnames content . new-names)
+  ;; If there are no new names, we can simply return the content.
+  (if (null? new-names)
+      content
+      ;; Add the classnames in a clean way, by comparing them
+      ;; against the existing tags and only adding them if they're
+      ;; not already there.
+      (let ((add (lambda (old-names)
+                   (string-join
+                     (lset-union string=?
+                                 new-names
+                                 (string-tokenize old-names))))))
+        ;; Little hack to force the tag to get matched.
+        (sxml-match (cons 'tag (cdr content))
+          ((tag (@ (class ,old-names) . ,rest) . ,body)
+           `(,(car content) (@ (class ,(add old-names)) ,@rest) ,@body))
+          ((tag (@ . ,rest) . ,body)
+           `(,(car content) (@ (class ,(add "")) ,@rest) ,@body))
+          ((tag . ,body)
+           `(,(car content) (@ (class ,(add ""))) ,@body))))))
+
+;; Example use:
+(add-classnames '(p (@ (class "even")) "blah") "selected")
+=&gt;
+(p (@ (class "selected even")) "blah")
+</pre>
+
+  <p>Here, I&rsquo;ve used the <a href=
+  "http://celtic.benderweb.net/sxml-match/manual/index.html">sxml-match
+  library</a> by Jim Bender. This is a pattern matching library
+  which doesn&rsquo;t match s-expressions <em>literally</em>, but
+  &ldquo;knows&rdquo; about SXML. This means, among other things,
+  that it disregards attribute orderings. That&rsquo;s why
+  it&rsquo;s possible to match the <code>class</code> in any
+  position even though it&rsquo;s listed as the first attribute in
+  the pattern. This library is a valuable addition to our toolkit.
+  I&rsquo;ve hacked around a bit to make it match any tag we feed
+  it by replacing the tag itself in the input to the matcher by a
+  preselected tag called simply <code>tag</code>. This is because
+  the first element, like in a macro expression, can&rsquo;t be
+  variable. I recommend reading the documentation on the SXML-match
+  library if you would like to know more. The library is part of a
+  bigger web framework called &ldquo;<a href=
+  "http://celtic.benderweb.net/webit">WebIt!</a>&rdquo;, which also
+  includes a Scheme DSL for generating CSS.</p>
+
+  <p>It is certainly possible to exclusively use
+  <code>sxml-match</code> for generating your output by macro
+  translation instead of <code>pre-post-order</code>. The
+  disadvantage of this approach is that rulesets are not composable
+  like they are with <code>pre-post-order</code>. Otherwise, it
+  seems to be pretty much equivalent in functionality. On the other
+  hand, if you don&rsquo;t like the extra dependency, you could
+  also leave out <code>sxml-match</code> and write the
+  <code>add-classnames</code> procedure manually, but it&rsquo;s
+  not going to look pretty.</p>
+  <!--TOC subsection id="sec12" Getting child nodes and attributes-->
+
+  <h3 id="sec12" class="subsection">7.4&nbsp;&nbsp;Getting child
+  nodes and attributes</h3><!--SEC END -->
+
+  <p>Often, you only want to look at the child nodes of an element.
+  SXML can be tricky because it treats attribute nodes as regular
+  child nodes. This means you sometimes want to skip those, if
+  they&rsquo;re there. On other occasions, you want to be able to
+  assume there are attributes to make your code simpler to follow.
+  These two procedures will help with this:</p>
+  <pre class="verbatim">
+(define (child-nodes contents)
+  (sxml-match (cons 'tag (cdr contents))
+    ((tag (@ . ,attribs) . ,rest) rest)
+    ((tag . ,rest) rest)))
+
+(define (attributes contents)
+  (sxml-match (cons 'tag (cdr contents))
+    ((tag (@ . ,attribs) . ,rest) (cons '@ attribs))
+    ((tag . ,rest) '(@))))
+</pre><!--TOC subsection id="sec13" Pretty-printing-->
+
+  <h3 id="sec13" class="subsection">
+  7.5&nbsp;&nbsp;Pretty-printing</h3><!--SEC END -->
+
+  <p>The SXML-transforms package also comes with a <code>pp</code>
+  procedure for Scheme systems which don&rsquo;t have one natively.
+  This procedure pretty-prints a list structure in a nicely
+  indented way. This is great for debugging your SXML output.</p>
+  <!--TOC section id="sec14" Final example-->
+
+  <h2 id="sec14" class="section">8&nbsp;&nbsp;Final example</h2>
+  <!--SEC END -->
+
+  <p>To tie it all together, I&rsquo;ll show a complete example.
+  Suppose we&rsquo;re running a webshop and we would like to have
+  our products listed in a table. This uses definitions from
+  earlier in the text. Those are not reproduced here for
+  brevity.</p>
+  <pre class="verbatim">
+;; Requires SRFI-1 for circular-list and a map that
+;; stops after processing the shortest list.
+
+;; Tables, lists etc can be striped visually by
+;; adding even/odd class rules in CSS.
+(define (stripe . contents)
+  `(,(car contents) ,(attributes contents)
+    ,@(map (lambda (contents odd?)
+             (if odd?
+                 contents
+                 (add-classnames contents "even")))
+           (child-nodes contents) (circular-list #t #f))))
+
+(define table-rules
+  `((table . ,stripe)
+    (*default* . ,(lambda x x))
+    (*text* . ,(lambda (tag string) string))))
+
+;; These would normally come from a database or file, hence the id field.
+(define products
+  '((1 "Structure and Interpretation of Computer Programs, 2nd edition"
+       "Harold Abelson &amp; Gerald Jay Sussman"
+       "978-0262011532")
+    (2 "The Art of Computer Programming Volumes 1-3 Boxed Set"
+       "Donald Knuth"
+       "978-0201485417")
+    (3 "The Little Schemer, 4th Edition"
+       "Daniel P. Friedman and Matthias Felleisen"
+       "978-0262560993")
+    (4 "The Seasoned Schemer"
+       "Daniel P. Friedman and Matthias Felleisen"
+       "978-0262561006")
+    (5 "The Reasoned Schemer"
+       "Daniel P. Friedman, William E. Byrd and Oleg Kyselyov"
+       "978-0262562140")
+    (6 "The Scheme Programming Language, 3rd Edition"
+       "R. Kent Dybvig"
+       "978-0262541480")))
+
+(define id first)
+(define title second)
+(define author third)
+(define isbn fourth)
+
+(define product-rules
+  `((products *macro* .
+      ,(lambda (tag)
+         `(table
+           (tr (th "Title") (th "Author") (th "ISBN"))
+            ,@(map (lambda (product)
+                     `(tr (td (details-link ,product ,(title product)))
+                          (td (details-link ,product ,(author product)))
+                          (td (details-link ,product ,(isbn product)))))
+                  products))))
+    (details-link .
+      ,(lambda (tag product . contents)
+         `(a (@ (href ,(string-append "details.sxml?id="
+                                      (number-&gt;string (id product)))))
+             ,@contents)))
+    (*text* . ,(lambda (tag str) str))
+    (*default* . ,(lambda x x))))
+
+(define document
+  '(page "Product overview"
+     (h1 "Products")
+     (p "Please click on a product to see its details.")
+     (products)))
+
+(output-html document
+             product-rules
+             table-rules
+             page-rules
+             (append doctype-rules universal-conversion-rules))
+</pre>
+
+  <p>Our <code>layout.css</code> can look something like this:</p>
+  <pre class="verbatim">
+.even {
+    background-color: #aaff00;
+}
+</pre>
+
+  <p>Now every even row in the table will have a lime background
+  color. Of course, you need to write a <code>details.sxml</code>
+  for this page to work as it should.</p>
+  <!--TOC section id="sec15" More information-->
+
+  <h2 id="sec15" class="section">9&nbsp;&nbsp;More information</h2>
+  <!--SEC END -->
+
+  <p>If you would like to know more about SXML, visit the <a href=
+  "http://ssax.sourceforge.net">SSAX project homepage</a> and
+  <a href="http://www.okmij.org/ftp/Scheme/xml.html">Oleg
+  Kiselyov&rsquo;s SXML page</a>. You can find not only the
+  official specification of SXML here, but also information about
+  other SXML technologies (including how to write XML-to-SXML
+  parsers). Happy Scheming!</p><!--BEGIN NOTES document-->
+  <hr class="footnoterule" />
+
+  <dl class="thefootnotes">
+    <dt class="dt-thefootnotes"><a id="note1" href="#text1" name=
+    "note1">1</a></dt>
+
+    <dd class="dd-thefootnotes">
+      <div class="footnotetext">
+        If we had translated the XHTML to SXML with a parser like
+        SSAX, we&rsquo;d end up with a slightly different
+        structure, because it would interpret and encode the
+        namespace information differently. To keep things simple,
+        we&rsquo;ll just treat namespaces as simple attributes
+        here.
+      </div>
+    </dd>
+
+    <dt class="dt-thefootnotes"><a id="note2" href="#text2" name=
+    "note2">2</a></dt>
+
+    <dd class="dd-thefootnotes">
+      <div class="footnotetext">
+        Chicken users will find these in the spiffy-utils egg.
+      </div>
+    </dd>
+  </dl><!--END NOTES-->
+  <!--CUT END -->
+  <!--HTMLFOOT-->
+  <!--ENDHTML-->
+  <!--FOOTER-->
+  <hr class="c3" />
+
+  <blockquote class="quote">
+    <em>This document was translated from
+    L<sup>A</sup>T<sub>E</sub>X by</em> <a href=
+    "http://hevea.inria.fr/index.html"><em>H</em><em><span class=
+    "c4"><sup>E</sup></span></em><em>V</em><em><span class=
+    "c4"><sup>E</sup></span></em><em>A</em></a><em>.</em>
+  </blockquote>
+</body>
+</html>
