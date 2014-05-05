@@ -1,29 +1,21 @@
-tidy_err_log = tidy.errors
-info_outline = info-outline.xml
+articles_outline = art-outline.xml
+articles = $(wildcard articles/*.article.m4)
 
-AUTO_GEN_FILES = sxslt.h* sxslt.xh* \
-  $(tidy_err_log) $(info_outline)
+AUTO_GEN_FILES = $(articles_outline) index.xhtml
 
-all: sxslt.xhtml $(info_outline)
+all :: index.xhtml
 
-sxslt.xhtml: sxslt.html
-	-tidy -f $(tidy_err_log) -qci \
-		-asxhtml -o $@ $^
-	# TODO transform and append css
-	#
-  #<link type="text/css" rel="stylesheet" media="all" href="info-p-sxml.css" />
+include aux.mk
 
-sxslt.html: sxslt.tex
-# latex 2 html
-	hevea -s $^ 
-# test
-	xmllint --html --noout $@
-	
-infos = $(wildcard infos/*)
-$(info_outline): $(infos)
-	ls $(dir $<) > $@
+$(articles_outline): $(articles)
 
-index.xhtml: index.m4 $(info_outline)
+index.xhtml: index.m4 $(articles_outline)
+	m4 $< > $@
 
 clean:
 	rm -rf $(AUTO_GEN_FILES)
+
+	
+
+
+
