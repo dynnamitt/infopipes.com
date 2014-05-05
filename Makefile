@@ -1,37 +1,16 @@
-info_outline = info-outline.xml
+articles_outline = art-outline.xml
+articles = $(wildcard articles/*.article.m4)
 
-AUTO_GEN_FILES = $(info_outline)
+AUTO_GEN_FILES = $(articles_outline) index.xhtml
 
-all: sxslt.xhtml $(info_outline)
+all :: index.xhtml
 
-	
-infos = $(wildcard infos/*)
-$(info_outline): $(infos)
-	ls $(dir $<) > $@
+include aux.mk
 
-index.xhtml: index.m4 $(info_outline)
+$(articles_outline): $(articles)
+
+index.xhtml: index.m4 $(articles_outline)
+	m4 $< > $@
 
 clean:
 	rm -rf $(AUTO_GEN_FILES)
-
-
-# external stuff;
-
-# TODO move to .mk file
-tidy_err_log = tidy.errors 
-
-AUTO_GEN_FILES += $(tidy_err_log) sxslt.h* sxslt.xh*
-
-sxslt.xhtml: sxslt.html
-	-tidy -f $(tidy_err_log) -qci \
-		-asxhtml -o $@ $^
-	# TODO transform and append css
-	#
-  #<link type="text/css" rel="stylesheet" media="all" href="info-p-sxml.css" />
-
-sxslt.html: sxslt.tex
-# latex 2 html
-	hevea -s $^ 
-# test
-	xmllint --html --noout $@
-
