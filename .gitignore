@@ -4,5 +4,5 @@
 *.swo
 sxslt.html
 index.xhtml
-*outline.nav
+*outline.m4
 articles/*.xhtml
