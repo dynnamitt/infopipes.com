@@ -1,5 +1,5 @@
 tidy_err_log = tidy.errors
-AUTO_GEN_FILES =+ sxslt.h* $(tidy_err_log)
+AUTO_GEN_FILES += sxslt.h* $(tidy_err_log)
 
 # all:: sxslt.xhtml
 
